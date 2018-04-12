@@ -1,7 +1,7 @@
 const express = require('express');
 const bp = require('body-parser');
 const app = express();
-const knex = require('./knex.knex.js');
+const knex = require('./knex/knex.js');
 
 var users = require('./routes/users.js');
 var products = require('./routes/products.js');
