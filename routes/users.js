@@ -103,4 +103,26 @@ router.put('/:id/forgot-password', (req, res) => {
     });
 });
 
+router.delete('/:id', (req, res) => {
+  let userId = req.params.id;
+  console.log(userId);
+  knex
+    .select()
+    .from('users')
+    .where('id', userId)
+    .delete()
+    .then(() => {
+      let grabUsers = knex.select().from('users');
+      return grabUsers;
+    })
+    .then(grabUsers => {
+      console.log(grabUsers);
+      res.status(200).json({ message: `user id: ${userId} deleted` });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400).json({ message: 'User Id not found' });
+    });
+});
+
 module.exports = router;
