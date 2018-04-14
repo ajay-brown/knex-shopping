@@ -3,6 +3,18 @@ var router = express.Router();
 const knex = require('../knex/knex.js');
 const JSON = require('circular-json');
 
+// const IdList = knex
+//   .select('id')
+//   .from('users')
+//   .then(data => {
+//     return data;
+//   })
+//   .then(data => {
+//     console.log(data);
+//     console.log(2);
+//     return JSON.stringify(data);
+//   });
+
 router.get('/:id', (req, res) => {
   let userId = parseInt(req.params.id);
   knex
@@ -37,44 +49,40 @@ router.post('/login', (req, res) => {
 router.post('/register', (req, res) => {
   let propEmail = req.body.email;
   let propPw = req.body.password;
+
   knex //checking for repeating
     .select('email')
     .from('users')
     .where('email', propEmail)
-    .then(data => {
-      console.log(data);
-      return data;
-    })
-    .then(data => {
-      let emailData = JSON.stringify(data);
-
-      if (
-        (emailData = propEmail) //if email exists
-      ) {
-        console.log('userexists');
-
-        res.status(400).json({ message: 'User Already Exists' });
-      } else {
-        console.log('creatingnewuser');
-        knex('users')
-          .insert([{ email: propEmail, password: propPw }])
-          .then(() => {
-            let grabUsers = knex
-              .select()
-              .from('users')
-              .where('email', propEmail);
-            return grabUsers;
-          })
-          .then(grabUsers => {
-            console.log(grabUsers);
-            res.status(200).json(grabUsers);
-          })
-          .catch(err => {
-            console.log(err);
-            res.status(400).json({ message: 'Error' });
-          });
+    .then(
+      data => {
+        if (data) {
+          //functional
+          console.log('user exists');
+          res.status(400).json({ message: 'User Already Exists' });
+        } else {
+          console.log('creatingnewuser');
+          knex('users')
+            .insert([{ email: propEmail, password: propPw }])
+            .then(() => {
+              let grabUsers = knex
+                .select()
+                .from('users')
+                .where('email', propEmail);
+              return grabUsers;
+            })
+            .then(grabUsers => {
+              console.log(grabUsers);
+              res.status(200).json(grabUsers);
+            })
+            .catch(err => {
+              console.log(err);
+              res.status(400).json({ message: 'Error' });
+            });
+        }
       }
-    });
+      //    }
+    );
 });
 
 router.put('/:id/forgot-password', (req, res) => {
